@@ -1,0 +1,58 @@
+syntax = "proto3";
+package kratos.api;
+
+option go_package = "knowledges/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  MySQL mysql = 1;
+  Neo4j neo4j = 2;
+  Redis redis = 3;
+  JWT jwt = 4;
+}
+
+message JWT {
+  string secret = 1;
+}
+
+message MySQL {
+  string dsn = 1;
+  int32 max_open_conn = 2;
+  int32 max_idle_conn = 3;
+  string conn_max_lifetime = 4;
+}
+
+message Neo4j {
+  string uri = 1;
+  string username = 2;
+  string password = 3;
+  string max_conn_lifetime = 4;
+}
+
+message Redis {
+  string network = 1;
+  string addr = 2;
+  google.protobuf.Duration read_timeout = 3;
+  google.protobuf.Duration write_timeout = 4;
+}

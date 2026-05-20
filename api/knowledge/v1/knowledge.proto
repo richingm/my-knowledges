@@ -1,0 +1,355 @@
+syntax = "proto3";
+
+package knowledge.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "my_knowledges/api/knowledge/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.knowledge.v1";
+option java_outer_classname = "KnowledgeProtoV1";
+
+// 领域服务
+service DomainService {
+  // 获取领域列表
+  rpc ListDomains (ListDomainsRequest) returns (ListDomainsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/domains"
+    };
+  }
+}
+
+// 领域消息
+message Domain {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  string name = 5;
+  string description = 6;
+  int64 by_sort = 7;
+}
+
+// 获取领域列表请求
+message ListDomainsRequest {
+}
+
+// 获取领域列表响应
+message ListDomainsResponse {
+  repeated Domain items = 1;
+}
+
+// 知识库服务
+service KnowledgeService {
+  // 创建知识库
+  rpc CreateKnowledge (CreateKnowledgeRequest) returns (Knowledge) {
+    option (google.api.http) = {
+      post: "/api/v1/knowledges"
+      body: "*"
+    };
+  }
+
+
+  // 更新知识库
+  rpc UpdateKnowledge (UpdateKnowledgeRequest) returns (Knowledge) {
+    option (google.api.http) = {
+      put: "/api/v1/knowledges/{id}"
+      body: "*"
+    };
+  }
+  
+  // 删除知识库
+  rpc DeleteKnowledge (DeleteKnowledgeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/knowledges/{id}"
+    };
+  }
+  
+  // 获取知识库树
+  rpc GetKnowledgeTree (GetKnowledgeTreeRequest) returns (GetKnowledgeTreeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/knowledge-tree"
+    };
+  }
+  
+  // 排序知识库
+  rpc SortKnowledge (SortKnowledgeRequest) returns (SortKnowledgeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/knowledges/sort"
+      body: "*"
+    };
+  }
+  
+  // 移动知识库
+  rpc MoveKnowledge (MoveKnowledgeRequest) returns (MoveKnowledgeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/knowledges/move"
+      body: "*"
+    };
+  }
+}
+
+// 文章服务
+service ArticleService {
+  // 创建文章
+  rpc CreateArticle (CreateArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/articles"
+      body: "*"
+    };
+  }
+
+
+  // 获取单个文章
+  rpc GetArticle (GetArticleRequest) returns (Article) {
+    option (google.api.http) = {
+      get: "/api/v1/articles/{id}"
+    };
+  }
+  
+  // 更新文章
+  rpc UpdateArticle (UpdateArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/articles/{id}"
+      body: "*"
+    };
+  }
+  
+  // 删除文章
+  rpc DeleteArticle (DeleteArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/articles/{id}"
+    };
+  }
+  
+  // 获取文章树
+  rpc GetArticleTree (GetArticleTreeRequest) returns (GetArticleTreeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/article-tree"
+    };
+  }
+  
+  // 排序文章
+  rpc SortArticle (SortArticleRequest) returns (SortArticleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/articles/sort"
+      body: "*"
+    };
+  }
+  
+  // 移动文章
+  rpc MoveArticle (MoveArticleRequest) returns (MoveArticleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/articles/move"
+      body: "*"
+    };
+  }
+}
+
+
+// 知识库消息
+message Knowledge {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  int64 domain_id = 5;
+  int64 parent_knowledge_id = 6;
+  string name = 7;
+  string description = 8;
+  int64 by_sort = 9;
+}
+
+// 创建知识库请求
+message CreateKnowledgeRequest {
+  int64 domain_id = 1;
+  int64 parent_knowledge_id = 2;
+  string name = 3;
+  string description = 4;
+  int64 by_sort = 5;
+}
+
+
+
+// 更新知识库请求
+message UpdateKnowledgeRequest {
+  int64 id = 1;
+  int64 domain_id = 2;
+  int64 parent_knowledge_id = 3;
+  string name = 4;
+  string description = 5;
+  int64 by_sort = 6;
+}
+
+// 删除知识库请求
+message DeleteKnowledgeRequest {
+  int64 id = 1;
+}
+
+// 获取知识库树请求
+message GetKnowledgeTreeRequest {
+  int64 domain_id = 1;
+}
+
+// 获取知识库树响应
+message GetKnowledgeTreeResponse {
+  repeated KnowledgeTreeNode items = 1;
+}
+
+// 知识库树节点
+message KnowledgeTreeNode {
+  int64 id = 1;
+  int64 domain_id = 2;
+  int64 parent_knowledge_id = 3;
+  string name = 4;
+  string description = 5;
+  int64 by_sort = 6;
+  repeated KnowledgeTreeNode children = 7;
+}
+
+// 文章消息
+message Article {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  int64 knowledge_id = 5;
+  int64 parent_article_id = 6;
+  string title = 7;
+  string content = 8;
+  int32 level = 9;
+  int64 by_sort = 10;
+}
+
+// 创建文章请求
+message CreateArticleRequest {
+  int64 knowledge_id = 1;
+  int64 parent_article_id = 2;
+  string title = 3;
+  string content = 4;
+  int32 level = 5;
+  int64 by_sort = 6;
+}
+
+
+// 获取单个文章请求
+message GetArticleRequest {
+  int64 id = 1;
+}
+
+// 更新文章请求
+message UpdateArticleRequest {
+  int64 id = 1;
+  int64 knowledge_id = 2;
+  int64 parent_article_id = 3;
+  string title = 4;
+  string content = 5;
+  int32 level = 6;
+  int64 by_sort = 7;
+}
+
+// 删除文章请求
+message DeleteArticleRequest {
+  int64 id = 1;
+}
+
+// 获取文章树请求
+message GetArticleTreeRequest {
+  int64 knowledge_id = 1;
+}
+
+// 获取文章树响应
+message GetArticleTreeResponse {
+  repeated ArticleTreeNode items = 1;
+}
+
+// 文章树节点
+message ArticleTreeNode {
+  int64 id = 1;
+  int64 knowledge_id = 2;
+  int64 parent_article_id = 3;
+  string title = 4;
+  string content = 5;
+  int32 level = 6;
+  int64 by_sort = 7;
+  repeated ArticleTreeNode children = 8;
+}
+
+// 文章响应
+message ArticleResponse {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+  int64 knowledge_id = 5;
+  int64 parent_article_id = 6;
+  string title = 7;
+  string content = 8;
+  int32 level = 9;
+  int64 by_sort = 10;
+}
+
+// 排序知识库请求
+message SortKnowledgeRequest {
+  repeated KnowledgeSortItem items = 1;
+}
+
+// 知识库排序项
+message KnowledgeSortItem {
+  int64 id = 1;
+  int64 by_sort = 2;
+}
+
+// 排序知识库响应
+message SortKnowledgeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// 排序文章请求
+message SortArticleRequest {
+  repeated ArticleSortItem items = 1;
+}
+
+// 文章排序项
+message ArticleSortItem {
+  int64 id = 1;
+  int64 by_sort = 2;
+}
+
+// 排序文章响应
+message SortArticleResponse {
+  bool success = 1;
+  string message = 2;
+  repeated ArticleTreeNode article_tree = 3;
+}
+
+// 移动知识库请求
+message MoveKnowledgeRequest {
+  int64 id = 1;
+  int64 new_parent_id = 2;
+  int64 domain_id = 3;
+}
+
+// 移动知识库响应
+message MoveKnowledgeResponse {
+  bool success = 1;
+  string message = 2;
+  repeated KnowledgeTreeNode knowledge_tree = 3;
+}
+
+// 移动文章请求
+message MoveArticleRequest {
+  int64 id = 1;
+  int64 new_parent_id = 2;
+  int64 knowledge_id = 3;
+}
+
+// 移动文章响应
+message MoveArticleResponse {
+  bool success = 1;
+  string message = 2;
+  repeated ArticleTreeNode article_tree = 3;
+}

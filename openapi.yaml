@@ -1,0 +1,712 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/article-tree:
+        get:
+            tags:
+                - ArticleService
+            description: 获取文章树
+            operationId: ArticleService_GetArticleTree
+            parameters:
+                - name: knowledgeId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.GetArticleTreeResponse'
+    /api/v1/articles:
+        post:
+            tags:
+                - ArticleService
+            description: 创建文章
+            operationId: ArticleService_CreateArticle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.CreateArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.ArticleResponse'
+    /api/v1/articles/move:
+        post:
+            tags:
+                - ArticleService
+            description: 移动文章
+            operationId: ArticleService_MoveArticle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.MoveArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.MoveArticleResponse'
+    /api/v1/articles/sort:
+        post:
+            tags:
+                - ArticleService
+            description: 排序文章
+            operationId: ArticleService_SortArticle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.SortArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.SortArticleResponse'
+    /api/v1/articles/{id}:
+        get:
+            tags:
+                - ArticleService
+            description: 获取单个文章
+            operationId: ArticleService_GetArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.Article'
+        put:
+            tags:
+                - ArticleService
+            description: 更新文章
+            operationId: ArticleService_UpdateArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.UpdateArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.ArticleResponse'
+        delete:
+            tags:
+                - ArticleService
+            description: 删除文章
+            operationId: ArticleService_DeleteArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.ArticleResponse'
+    /api/v1/domains:
+        get:
+            tags:
+                - DomainService
+            description: 获取领域列表
+            operationId: DomainService_ListDomains
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.ListDomainsResponse'
+    /api/v1/files/upload:
+        post:
+            tags:
+                - FileService
+            operationId: FileService_Upload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/file.v1.UploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/file.v1.UploadReply'
+    /api/v1/files/{filename}:
+        get:
+            tags:
+                - FileService
+            operationId: FileService_View
+            parameters:
+                - name: filename
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/file.v1.ViewReply'
+    /api/v1/files/{filename}/download:
+        get:
+            tags:
+                - FileService
+            operationId: FileService_Download
+            parameters:
+                - name: filename
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/file.v1.ViewReply'
+    /api/v1/knowledge-tree:
+        get:
+            tags:
+                - KnowledgeService
+            description: 获取知识库树
+            operationId: KnowledgeService_GetKnowledgeTree
+            parameters:
+                - name: domainId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.GetKnowledgeTreeResponse'
+    /api/v1/knowledges:
+        post:
+            tags:
+                - KnowledgeService
+            description: 创建知识库
+            operationId: KnowledgeService_CreateKnowledge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.CreateKnowledgeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.Knowledge'
+    /api/v1/knowledges/move:
+        post:
+            tags:
+                - KnowledgeService
+            description: 移动知识库
+            operationId: KnowledgeService_MoveKnowledge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.MoveKnowledgeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.MoveKnowledgeResponse'
+    /api/v1/knowledges/sort:
+        post:
+            tags:
+                - KnowledgeService
+            description: 排序知识库
+            operationId: KnowledgeService_SortKnowledge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.SortKnowledgeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.SortKnowledgeResponse'
+    /api/v1/knowledges/{id}:
+        put:
+            tags:
+                - KnowledgeService
+            description: 更新知识库
+            operationId: KnowledgeService_UpdateKnowledge
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/knowledge.v1.UpdateKnowledgeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/knowledge.v1.Knowledge'
+        delete:
+            tags:
+                - KnowledgeService
+            description: 删除知识库
+            operationId: KnowledgeService_DeleteKnowledge
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+components:
+    schemas:
+        file.v1.UploadReply:
+            type: object
+            properties:
+                name:
+                    type: string
+                url:
+                    type: string
+        file.v1.UploadRequest:
+            type: object
+            properties: {}
+        file.v1.ViewReply:
+            type: object
+            properties:
+                content:
+                    type: string
+                    format: bytes
+                contentType:
+                    type: string
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+        knowledge.v1.Article:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                deletedAt:
+                    type: string
+                    format: date-time
+                knowledgeId:
+                    type: string
+                parentArticleId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                level:
+                    type: integer
+                    format: int32
+                bySort:
+                    type: string
+            description: 文章消息
+        knowledge.v1.ArticleResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                deletedAt:
+                    type: string
+                    format: date-time
+                knowledgeId:
+                    type: string
+                parentArticleId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                level:
+                    type: integer
+                    format: int32
+                bySort:
+                    type: string
+            description: 文章响应
+        knowledge.v1.ArticleSortItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                bySort:
+                    type: string
+            description: 文章排序项
+        knowledge.v1.ArticleTreeNode:
+            type: object
+            properties:
+                id:
+                    type: string
+                knowledgeId:
+                    type: string
+                parentArticleId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                level:
+                    type: integer
+                    format: int32
+                bySort:
+                    type: string
+                children:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.ArticleTreeNode'
+            description: 文章树节点
+        knowledge.v1.CreateArticleRequest:
+            type: object
+            properties:
+                knowledgeId:
+                    type: string
+                parentArticleId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                level:
+                    type: integer
+                    format: int32
+                bySort:
+                    type: string
+            description: 创建文章请求
+        knowledge.v1.CreateKnowledgeRequest:
+            type: object
+            properties:
+                domainId:
+                    type: string
+                parentKnowledgeId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                bySort:
+                    type: string
+            description: 创建知识库请求
+        knowledge.v1.Domain:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                deletedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                description:
+                    type: string
+                bySort:
+                    type: string
+            description: 领域消息
+        knowledge.v1.GetArticleTreeResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.ArticleTreeNode'
+            description: 获取文章树响应
+        knowledge.v1.GetKnowledgeTreeResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.KnowledgeTreeNode'
+            description: 获取知识库树响应
+        knowledge.v1.Knowledge:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                deletedAt:
+                    type: string
+                    format: date-time
+                domainId:
+                    type: string
+                parentKnowledgeId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                bySort:
+                    type: string
+            description: 知识库消息
+        knowledge.v1.KnowledgeSortItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                bySort:
+                    type: string
+            description: 知识库排序项
+        knowledge.v1.KnowledgeTreeNode:
+            type: object
+            properties:
+                id:
+                    type: string
+                domainId:
+                    type: string
+                parentKnowledgeId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                bySort:
+                    type: string
+                children:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.KnowledgeTreeNode'
+            description: 知识库树节点
+        knowledge.v1.ListDomainsResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.Domain'
+            description: 获取领域列表响应
+        knowledge.v1.MoveArticleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                newParentId:
+                    type: string
+                knowledgeId:
+                    type: string
+            description: 移动文章请求
+        knowledge.v1.MoveArticleResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+                articleTree:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.ArticleTreeNode'
+            description: 移动文章响应
+        knowledge.v1.MoveKnowledgeRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                newParentId:
+                    type: string
+                domainId:
+                    type: string
+            description: 移动知识库请求
+        knowledge.v1.MoveKnowledgeResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+                knowledgeTree:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.KnowledgeTreeNode'
+            description: 移动知识库响应
+        knowledge.v1.SortArticleRequest:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.ArticleSortItem'
+            description: 排序文章请求
+        knowledge.v1.SortArticleResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+                articleTree:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.ArticleTreeNode'
+            description: 排序文章响应
+        knowledge.v1.SortKnowledgeRequest:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/knowledge.v1.KnowledgeSortItem'
+            description: 排序知识库请求
+        knowledge.v1.SortKnowledgeResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                message:
+                    type: string
+            description: 排序知识库响应
+        knowledge.v1.UpdateArticleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                knowledgeId:
+                    type: string
+                parentArticleId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                level:
+                    type: integer
+                    format: int32
+                bySort:
+                    type: string
+            description: 更新文章请求
+        knowledge.v1.UpdateKnowledgeRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                domainId:
+                    type: string
+                parentKnowledgeId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                bySort:
+                    type: string
+            description: 更新知识库请求
+tags:
+    - name: ArticleService
+      description: 文章服务
+    - name: DomainService
+      description: 领域服务
+    - name: FileService
+    - name: Greeter
+      description: The greeting service definition.
+    - name: KnowledgeService
+      description: 知识库服务

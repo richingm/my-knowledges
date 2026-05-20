@@ -1,0 +1,26 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 1s
+data:
+  mysql:
+    dsn: "root:123456@tcp(localhost:3307)/knowledges?charset=utf8mb4&parseTime=True&loc=Local"
+    max_open_conn: 50
+    max_idle_conn: 10
+    conn_max_lifetime: 3600s
+  jwt:
+    secret: "my_knowledges_jwt_secret_key_2024"
+
+  neo4j:
+    uri: "neo4j://127.0.0.1:7687"
+    username: "neo4j"
+    password: "password"
+    max_conn_lifetime: 3600s
+
+  redis:
+    addr: 127.0.0.1:6379
+    read_timeout: 0.2s
+    write_timeout: 0.2s
