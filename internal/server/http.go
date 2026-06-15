@@ -7,6 +7,7 @@ import (
 	fileV1 "my_knowledges/api/file/v1"
 	v1 "my_knowledges/api/helloworld/v1"
 	knowledgev1 "my_knowledges/api/knowledge/v1"
+	userv1 "my_knowledges/api/user/v1"
 	"my_knowledges/internal/conf"
 	"my_knowledges/internal/service"
 	"net/http"
@@ -21,7 +22,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, domain *service.DomainService, knowledge *service.KnowledgeService, article *service.ArticleService, file *service.FileService, logger log.Logger) *httpTransport.Server {
+func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, domain *service.DomainService, knowledge *service.KnowledgeService, article *service.ArticleService, file *service.FileService, user *service.UserService, logger log.Logger) *httpTransport.Server {
 	var opts = []httpTransport.ServerOption{
 		httpTransport.Middleware(
 			recovery.Recovery(),
@@ -145,5 +146,6 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, domain *serv
 	knowledgev1.RegisterKnowledgeServiceHTTPServer(srv, knowledge)
 	knowledgev1.RegisterArticleServiceHTTPServer(srv, article)
 	fileV1.RegisterFileServiceHTTPServer(srv, file)
+	userv1.RegisterUserServiceHTTPServer(srv, user)
 	return srv
 }

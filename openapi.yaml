@@ -324,6 +324,57 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/users/login:
+        post:
+            tags:
+                - UserService
+            description: 用户登录
+            operationId: UserService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.LoginResponse'
+    /api/v1/users/me:
+        get:
+            tags:
+                - UserService
+            description: 获取当前用户信息
+            operationId: UserService_GetCurrentUser
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.GetCurrentUserResponse'
+    /api/v1/users/register:
+        post:
+            tags:
+                - UserService
+            description: 用户注册
+            operationId: UserService_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.v1.RegisterRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.RegisterResponse'
     /helloworld/{name}:
         get:
             tags:
@@ -700,6 +751,70 @@ components:
                 bySort:
                     type: string
             description: 更新知识库请求
+        user.v1.GetCurrentUserResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/user.v1.User'
+            description: 获取当前用户响应
+        user.v1.LoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+            description: 登录请求
+        user.v1.LoginResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                email:
+                    type: string
+                token:
+                    type: string
+            description: 登录响应
+        user.v1.RegisterRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+            description: 注册请求
+        user.v1.RegisterResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                email:
+                    type: string
+                token:
+                    type: string
+            description: 注册响应
+        user.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                username:
+                    type: string
+                email:
+                    type: string
+            description: 用户消息
 tags:
     - name: ArticleService
       description: 文章服务
@@ -710,3 +825,5 @@ tags:
       description: The greeting service definition.
     - name: KnowledgeService
       description: 知识库服务
+    - name: UserService
+      description: 用户服务

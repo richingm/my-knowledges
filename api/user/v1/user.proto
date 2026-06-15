@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "my_knowledges/api/user/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.user.v1";
+option java_outer_classname = "UserProtoV1";
+
+// 用户服务
+service UserService {
+  // 用户注册
+  rpc Register (RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/register"
+      body: "*"
+    };
+  }
+
+  // 用户登录
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/login"
+      body: "*"
+    };
+  }
+
+  // 获取当前用户信息
+  rpc GetCurrentUser (GetCurrentUserRequest) returns (GetCurrentUserResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users/me"
+    };
+  }
+}
+
+// 用户消息
+message User {
+  int64 id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  string username = 4;
+  string email = 5;
+}
+
+// 注册请求
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+// 注册响应
+message RegisterResponse {
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+  string token = 4;
+}
+
+// 登录请求
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// 登录响应
+message LoginResponse {
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+  string token = 4;
+}
+
+// 获取当前用户请求
+message GetCurrentUserRequest {
+}
+
+// 获取当前用户响应
+message GetCurrentUserResponse {
+  User user = 1;
+}

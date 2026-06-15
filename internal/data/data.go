@@ -21,6 +21,7 @@ var ProviderSet = wire.NewSet(
 	NewDomainRepo,
 	NewKnowledgeRepo,
 	NewArticleRepo,
+	NewUserRepo,
 )
 
 // 创建一个实现了 gormlogger.Writer 接口的包装器
@@ -72,6 +73,7 @@ func NewMySQL(conf *conf.Data, logger log.Logger) (*gorm.DB, func(), error) {
 		&biz.Domain{},
 		&biz.Knowledge{},
 		&biz.Article{},
+		&biz.User{},
 	); err != nil {
 		l.Errorf("Failed to auto migrate: %v", err)
 		return nil, nil, err

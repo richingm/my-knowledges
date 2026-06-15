@@ -8,4 +8,5 @@ var ProviderSet = wire.NewSet(
 	NewDomainUsecase,
 	NewKnowledgeUsecase,
 	NewArticleUsecase,
+	NewUserUsecase,
 )

@@ -4,6 +4,7 @@ import (
 	filev1 "my_knowledges/api/file/v1"
 	v1 "my_knowledges/api/helloworld/v1"
 	knowledgev1 "my_knowledges/api/knowledge/v1"
+	userv1 "my_knowledges/api/user/v1"
 	"my_knowledges/internal/conf"
 	"my_knowledges/internal/service"
 
@@ -13,7 +14,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, domain *service.DomainService, knowledge *service.KnowledgeService, article *service.ArticleService, file *service.FileService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, domain *service.DomainService, knowledge *service.KnowledgeService, article *service.ArticleService, file *service.FileService, user *service.UserService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -34,5 +35,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, domain *serv
 	knowledgev1.RegisterKnowledgeServiceServer(srv, knowledge)
 	knowledgev1.RegisterArticleServiceServer(srv, article)
 	filev1.RegisterFileServiceServer(srv, file)
+	userv1.RegisterUserServiceServer(srv, user)
 	return srv
 }
