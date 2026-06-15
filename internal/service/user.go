@@ -7,10 +7,13 @@ import (
 
 	v1 "my_knowledges/api/user/v1"
 	"my_knowledges/internal/biz"
+	"my_knowledges/internal/conf"
 	"my_knowledges/internal/data"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	jwtv5 "github.com/golang-jwt/jwt/v5"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // UserService 用户服务
@@ -23,17 +26,12 @@ type UserService struct {
 }
 
 // NewUserService 创建用户服务
-func NewUserService(uc *biz.UserUsecase, logger log.Logger) *UserService {
+func NewUserService(uc *biz.UserUsecase, c *conf.Data, logger log.Logger) *UserService {
 	return &UserService{
 		uc:        uc,
 		log:       log.NewHelper(logger),
-		jwtSecret: "your-secret-key-here", // 建议从配置中读取
+		jwtSecret: c.Jwt.Secret,
 	}
-}
-
-// SetJWTSecret 设置JWT密钥
-func (s *UserService) SetJWTSecret(secret string) {
-	s.jwtSecret = secret
 }
 
 // Register 用户注册
@@ -92,11 +90,38 @@ func (s *UserService) Login(ctx context.Context, in *v1.LoginRequest) (*v1.Login
 
 // GetCurrentUser 获取当前用户信息
 func (s *UserService) GetCurrentUser(ctx context.Context, in *v1.GetCurrentUserRequest) (*v1.GetCurrentUserResponse, error) {
+	token, ok := jwt.FromContext(ctx)
+	if !ok {
+		return nil, errors.New("invalid token")
+	}
+
+	claims, ok := token.(jwtv5.MapClaims)
+	if !ok {
+		return nil, errors.New("invalid token claims")
+	}
+
+	uid, ok := claims["uid"].(float64)
+	if !ok {
+		return nil, errors.New("invalid token claims")
+	}
+
+	user, err := s.uc.GetUserByID(ctx, int64(uid))
+	if err != nil {
+		s.log.Errorf("Get user by id failed: %v", err)
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
 	return &v1.GetCurrentUserResponse{
 		User: &v1.User{
-			Id:       1,
-			Username: "test",
-			Email:    "test@example.com",
+			Id:        user.ID,
+			CreatedAt: timestamppb.New(user.CreatedAt),
+			UpdatedAt: timestamppb.New(user.UpdatedAt),
+			Username:  user.Username,
+			Email:     user.Email,
 		},
 	}, nil
 }
