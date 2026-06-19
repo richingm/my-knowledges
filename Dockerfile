@@ -40,7 +40,7 @@ RUN mkdir -p /data/conf /app/uploads
 EXPOSE 80 8000 9000
 
 VOLUME /data/conf
-VOLUME /app/uploads
+VOLUME /uploads
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
