@@ -103,7 +103,7 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 								http.Error(w, "copy file: "+err.Error(), http.StatusInternalServerError)
 								return
 							}
-							fileURL := "http://localhost:8000/api/v1/files/" + filename
+							fileURL := "http://39.105.17.55:8000/api/v1/files/" + filename
 							reply := &fileV1.UploadReply{
 								Name: filename,
 								Url:  fileURL,

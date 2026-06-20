@@ -2,8 +2,9 @@ package biz
 
 import (
 	"context"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // User 用户实体
@@ -14,6 +15,7 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Username  string         `gorm:"unique;not null"`
 	Email     string         `gorm:"unique;not null"`
+	Mobile    string         `gorm:"unique"`
 	Password  string         `gorm:"not null"`
 }
 
