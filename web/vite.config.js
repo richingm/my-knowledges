@@ -19,7 +19,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'http://host.docker.internal:8000',
-        target: 'http://39.105.17.55:8000',
+        target: 'http://39.105.17.55:80001',
         changeOrigin: true,
         secure: false,
       }

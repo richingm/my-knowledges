@@ -55,7 +55,7 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 		httpTransport.Filter(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/" {
-					w.Write([]byte("Welcome to Upload Service"))
+					http.ServeFile(w, r, "./web/dist/index.html")
 					return
 				}
 				if r.URL.Path == "/upload_test.html" {
@@ -69,6 +69,16 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 				}
 				if len(r.URL.Path) > 7 && r.URL.Path[:7] == "/files/" {
 					filePath := filepath.Join("./uploads", r.URL.Path[7:])
+					http.ServeFile(w, r, filePath)
+					return
+				}
+				if len(r.URL.Path) > 7 && r.URL.Path[:7] == "/assets" {
+					filePath := filepath.Join("./web/dist", r.URL.Path)
+					http.ServeFile(w, r, filePath)
+					return
+				}
+				if len(r.URL.Path) > 14 && r.URL.Path[:14] == "/api/v1/files/" {
+					filePath := filepath.Join("./uploads", r.URL.Path[14:])
 					http.ServeFile(w, r, filePath)
 					return
 				}
@@ -113,11 +123,6 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 							return
 						}
 					}
-				}
-				if len(r.URL.Path) > 14 && r.URL.Path[:14] == "/api/v1/files/" {
-					filePath := filepath.Join("./uploads", r.URL.Path[14:])
-					http.ServeFile(w, r, filePath)
-					return
 				}
 				next.ServeHTTP(w, r)
 			})
