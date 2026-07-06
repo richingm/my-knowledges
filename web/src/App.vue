@@ -71,46 +71,5 @@ body {
   }
 }
 
-/* 行内代码样式 */
-code {
-  font-family: monospace;
-  background-color: #f4f4f4;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  color: #333;
-}
-
-/* 代码块样式 */
-pre {
-  font-family: monospace;
-  background-color: #f8f9fa;
-  color: #333;
-  padding: 12px 16px;
-  border-radius: 8px;
-  overflow-x: auto;
-  line-height: 1.5;
-  font-size: 13px;
-  border: 1px solid #e9ecef;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-pre code {
-  background-color: transparent;
-  padding: 0;
-  color: inherit;
-}
-
-/* 富文本编辑器中的代码样式 */
-.editor-wrapper pre {
-  background-color: #2d2d2d !important;
-  color: #ccc !important;
-  border: none !important;
-}
-
-.editor-wrapper code {
-  background-color: transparent !important;
-  color: inherit !important;
-}
+/* 行内代码和代码块样式由 BlockNote 核心 CSS 处理，保持编辑/查看一致 */
 </style>

@@ -7,7 +7,7 @@ server:
     timeout: 1s
 data:
   mysql:
-    dsn: "root:123456@tcp(host.docker.internal:3307)/knowledges?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn: "root:123456@tcp(localhost:3307)/knowledges?charset=utf8mb4&parseTime=True&loc=Local"
     max_open_conn: 50
     max_idle_conn: 10
     conn_max_lifetime: 3600s

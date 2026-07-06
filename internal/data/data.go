@@ -21,6 +21,7 @@ var ProviderSet = wire.NewSet(
 	NewDomainRepo,
 	NewKnowledgeRepo,
 	NewArticleRepo,
+	NewTagRepo,
 	NewUserRepo,
 )
 
@@ -73,6 +74,8 @@ func NewMySQL(conf *conf.Data, logger log.Logger) (*gorm.DB, func(), error) {
 		&biz.Domain{},
 		&biz.Knowledge{},
 		&biz.Article{},
+		&biz.Tag{},
+		&biz.ArticleTag{},
 		&biz.User{},
 	); err != nil {
 		l.Errorf("Failed to auto migrate: %v", err)

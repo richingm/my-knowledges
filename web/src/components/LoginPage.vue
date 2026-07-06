@@ -31,26 +31,6 @@
           />
         </div>
         
-        <div class="form-group">
-          <label for="captcha">验证码</label>
-          <div class="captcha-row">
-            <input 
-              id="captcha"
-              v-model="captcha" 
-              type="text" 
-              placeholder="请输入验证码"
-              class="form-input captcha-input"
-              maxlength="4"
-              required
-            />
-            <canvas 
-              ref="captchaCanvas" 
-              class="captcha-img" 
-              @click="generateCaptcha"
-            ></canvas>
-          </div>
-        </div>
-        
         <button type="submit" class="login-btn" :disabled="isLoading">
           <span v-if="isLoading" class="loading">⏳</span>
           <span v-else>登 录</span>
@@ -67,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { authService } from '../services/authService';
 
@@ -76,87 +56,14 @@ const route = useRoute();
 
 const username = ref('');
 const password = ref('');
-const captcha = ref('');
-const captchaAnswer = ref('');
 const isLoading = ref(false);
 const error = ref('');
-const captchaCanvas = ref(null);
-
-const generateCaptcha = () => {
-  let num1 = Math.floor(Math.random() * 90) + 10;
-  let num2 = Math.floor(Math.random() * 90) + 10;
-  const operators = ['+', '-'];
-  const operator = operators[Math.floor(Math.random() * operators.length)];
-  
-  let answer;
-  let expression;
-  
-  if (operator === '+') {
-    answer = num1 + num2;
-    expression = `${num1} + ${num2}`;
-  } else {
-    if (num1 < num2) {
-      [num1, num2] = [num2, num1];
-    }
-    answer = num1 - num2;
-    expression = `${num1} - ${num2}`;
-  }
-  
-  captchaAnswer.value = answer.toString();
-  
-  const canvas = captchaCanvas.value;
-  if (!canvas) return;
-  
-  const ctx = canvas.getContext('2d');
-  const width = 120;
-  const height = 40;
-  
-  canvas.width = width;
-  canvas.height = height;
-  
-  ctx.fillStyle = '#f8fafc';
-  ctx.fillRect(0, 0, width, height);
-  
-  ctx.font = 'bold 20px Arial';
-  ctx.fillStyle = '#374151';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(expression, width / 2, height / 2);
-  
-  for (let i = 0; i < 4; i++) {
-    ctx.strokeStyle = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.3)`;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(Math.random() * width, Math.random() * height);
-    ctx.lineTo(Math.random() * width, Math.random() * height);
-    ctx.stroke();
-  }
-  
-  for (let i = 0; i < 20; i++) {
-    ctx.fillStyle = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.3)`;
-    ctx.beginPath();
-    ctx.arc(Math.random() * width, Math.random() * height, 1, 0, Math.PI * 2);
-    ctx.fill();
-  }
-};
 
 const handleLogin = async () => {
   error.value = '';
   
   if (!username.value || !password.value) {
     error.value = '请输入用户名和密码';
-    return;
-  }
-  
-  if (!captcha.value) {
-    error.value = '请输入验证码';
-    return;
-  }
-  
-  if (captcha.value !== captchaAnswer.value) {
-    error.value = '验证码错误';
-    generateCaptcha();
-    captcha.value = '';
     return;
   }
   
@@ -172,16 +79,10 @@ const handleLogin = async () => {
     }
   } catch (e) {
     error.value = e.message || '登录失败，请重试';
-    generateCaptcha();
-    captcha.value = '';
   } finally {
     isLoading.value = false;
   }
 };
-
-onMounted(() => {
-  generateCaptcha();
-});
 </script>
 
 <style scoped>
@@ -307,28 +208,5 @@ onMounted(() => {
   color: #6b7280;
   font-size: 14px;
   margin: 0;
-}
-
-.captcha-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.captcha-input {
-  flex: 1;
-}
-
-.captcha-img {
-  width: 120px;
-  height: 40px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.captcha-img:hover {
-  border-color: #667eea;
 }
 </style>

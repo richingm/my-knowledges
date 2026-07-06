@@ -1,14 +1,13 @@
 <script setup>
-import { ref, onMounted, watch, onUnmounted, shallowRef, nextTick } from 'vue';
+import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
-import '@wangeditor/editor/dist/css/style.css';
 import { domainService } from '../services/domainService';
 import { knowledgeService } from '../services/knowledgeService';
 import { articleService } from '../services/articleService';
 import { authService } from '../services/authService';
 import KnowledgeTree from './KnowledgeTree.vue';
 import ArticleTree from './ArticleTree.vue';
+import BlockNoteEditor from './BlockNoteEditor.vue';
 
 
 const router = useRouter();
@@ -26,71 +25,9 @@ const viewMode = ref('tree');
 const knowledgeCollapsed = ref(false);
 const articleCollapsed = ref(false);
 
-const toolbarConfig = {
-  excludeKeys: [
-    'fullscreen',
-    'group-video',
-    'insertVideo'
-  ]
-};
-
 const getAuthHeaders = () => {
   const token = localStorage.getItem('access_token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
-
-const editorConfig = {
-  placeholder: '请输入文章内容...',
-  autoFocus: true,
-  MENU_CONF: {
-    uploadImage: {
-      fieldName: 'file',
-      maxFileSize: 5 * 1024 * 1024,
-      maxNumberOfFiles: 5,
-      allowedFileTypes: ['image/*'],
-      timeout: 10 * 1000,
-
-      async customUpload(file, insertFn) {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        try {
-          const res = await fetch('/api/v1/files/upload', {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: formData,
-            timeout: 10000
-          })
-
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`)
-          }
-
-          const result = await res.json()
-          console.log('upload result:', result)
-
-          if (result && result.Url) {
-            insertFn(result.Url)
-            showNotification('图片上传成功!', 'success')
-          } else if (result && result.url) {
-            insertFn(result.url)
-            showNotification('图片上传成功!', 'success')
-          } else {
-            throw new Error('上传接口返回格式不正确')
-          }
-        } catch (err) {
-          console.error('图片上传失败:', err)
-          showNotification(`图片上传失败: ${err.message}`, 'error')
-        }
-      }
-    }
-  }
-};
-
-const editor = shallowRef(null);
-
-const handleCreated = (ed) => {
-  editor.value = ed;
 };
 
 const notification = ref({
@@ -580,7 +517,7 @@ const handleUpdateArticle = async () => {
   if (!editableArticle.value) return;
   
   try {
-    const content = editor.value ? editor.value.getHtml() : editableArticle.value.content;
+    const content = editableArticle.value.content;
     
     const result = await articleService.updateArticle(
       editableArticle.value.id,
@@ -876,14 +813,11 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="article-content">
-              <div v-if="mode === 'view'" v-html="articleDetail.content" class="content-view"></div>
+              <div v-if="mode === 'view'" class="editor-wrapper">
+                <BlockNoteEditor v-model="articleDetail.content" :readonly="true" />
+              </div>
               <div v-else class="editor-wrapper">
-                <Toolbar :editor="editor" :defaultConfig="toolbarConfig" />
-                <Editor 
-                  v-model="editableArticle.content" 
-                  :defaultConfig="editorConfig"
-                  @onCreated="handleCreated"
-                />
+                <BlockNoteEditor v-model="editableArticle.content" />
               </div>
             </div>
           </div>
@@ -1277,29 +1211,8 @@ onUnmounted(() => {
   padding: 1rem;
 }
 
-.content-view {
-  line-height: 1.6;
-}
-
-.content-view img {
-  max-width: 100%;
-  height: auto;
-  cursor: pointer;
-}
-
 .editor-wrapper {
   height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.editor-wrapper :deep(.w-e-toolbar) {
-  flex-shrink: 0;
-}
-
-.editor-wrapper :deep(.w-e-text-container) {
-  flex: 1;
-  overflow: auto;
 }
 
 .empty-state {
