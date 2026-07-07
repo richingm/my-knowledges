@@ -10,13 +10,13 @@ import (
 )
 
 type Tag struct {
-	ID          int64
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
-	Name        string         `gorm:"unique;not null;size:100"`
-	Description string         `gorm:"size:500"`
-	ArticleCount int64         `gorm:"default:0"`
+	ID           int64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	Name         string         `gorm:"unique;not null;size:100"`
+	Description  string         `gorm:"size:500"`
+	ArticleCount int64          `gorm:"default:0"`
 }
 
 type ArticleTag struct {
