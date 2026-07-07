@@ -25,6 +25,27 @@ const viewMode = ref('tree');
 const knowledgeCollapsed = ref(false);
 const articleCollapsed = ref(false);
 
+// 目录相关
+const tocItems = ref([]);
+const viewEditorRef = ref(null);
+const editEditorRef = ref(null);
+
+const handleTocUpdate = (items) => {
+  tocItems.value = items || [];
+};
+
+const handleTocClick = (item) => {
+  const ref = mode.value === 'view' ? viewEditorRef.value : editEditorRef.value;
+  if (ref && ref.scrollToHeading) {
+    ref.scrollToHeading(item.headingIndex);
+  }
+};
+
+// 文章切换时清空目录
+watch(articleDetail, (val) => {
+  if (!val) tocItems.value = [];
+});
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('access_token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -813,11 +834,35 @@ onUnmounted(() => {
               </div>
             </div>
             <div class="article-content">
-              <div v-if="mode === 'view'" class="editor-wrapper">
-                <BlockNoteEditor v-model="articleDetail.content" :readonly="true" />
+              <div class="toc-sidebar" v-if="tocItems.length > 0">
+                <div class="toc-header">目录</div>
+                <div class="toc-list">
+                  <div
+                    v-for="item in tocItems"
+                    :key="item.id"
+                    class="toc-item"
+                    :class="'toc-level-' + item.level"
+                    :title="item.text"
+                    @click="handleTocClick(item)"
+                  >
+                    {{ item.text }}
+                  </div>
+                </div>
               </div>
-              <div v-else class="editor-wrapper">
-                <BlockNoteEditor v-model="editableArticle.content" />
+              <div class="editor-wrapper">
+                <BlockNoteEditor
+                  v-if="mode === 'view'"
+                  ref="viewEditorRef"
+                  v-model="articleDetail.content"
+                  :readonly="true"
+                  @tocUpdate="handleTocUpdate"
+                />
+                <BlockNoteEditor
+                  v-else
+                  ref="editEditorRef"
+                  v-model="editableArticle.content"
+                  @tocUpdate="handleTocUpdate"
+                />
               </div>
             </div>
           </div>
@@ -1207,12 +1252,65 @@ onUnmounted(() => {
 
 .article-content {
   flex: 1;
-  overflow: auto;
-  padding: 1rem;
+  overflow: hidden;
+  display: flex;
+  padding: 0;
 }
 
+.toc-sidebar {
+  width: 220px;
+  min-width: 220px;
+  max-height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  padding: 0.75rem 0;
+}
+
+.toc-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.75rem 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 0.25rem;
+}
+
+.toc-list {
+  padding: 0.25rem 0;
+}
+
+.toc-item {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  color: #495057;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.toc-item:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+  border-left-color: #0d6efd;
+}
+
+.toc-level-1 { font-weight: 600; font-size: 0.85rem; }
+.toc-level-2 { padding-left: 1.5rem; }
+.toc-level-3 { padding-left: 2.25rem; font-size: 0.75rem; }
+.toc-level-4 { padding-left: 3rem; font-size: 0.75rem; }
+.toc-level-5 { padding-left: 3.75rem; font-size: 0.7rem; color: #6c757d; }
+.toc-level-6 { padding-left: 4.5rem; font-size: 0.7rem; color: #6c757d; }
+
 .editor-wrapper {
+  flex: 1;
   height: 100%;
+  overflow: hidden;
 }
 
 .empty-state {
