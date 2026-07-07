@@ -77,11 +77,6 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 					http.ServeFile(w, r, filePath)
 					return
 				}
-				if len(r.URL.Path) > 14 && r.URL.Path[:14] == "/api/v1/files/" {
-					filePath := filepath.Join("./uploads", r.URL.Path[14:])
-					http.ServeFile(w, r, filePath)
-					return
-				}
 				if (r.URL.Path == "/upload/file/http" || r.URL.Path == "/upload/image/http" || r.URL.Path == "/api/v1/files/upload") && r.Method == http.MethodPost {
 					if strings.Contains(r.Header.Get("Content-Type"), "multipart/form-data") {
 						if err := r.ParseMultipartForm(10 << 20); err != nil {
@@ -123,6 +118,11 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 							return
 						}
 					}
+				}
+				if len(r.URL.Path) > 14 && r.URL.Path[:14] == "/api/v1/files/" {
+					filePath := filepath.Join("./uploads", r.URL.Path[14:])
+					http.ServeFile(w, r, filePath)
+					return
 				}
 				next.ServeHTTP(w, r)
 			})
