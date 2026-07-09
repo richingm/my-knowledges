@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"time"
 
 	"my_knowledges/internal/biz"
 
@@ -33,14 +34,13 @@ func (r *knowledgeRepo) Save(ctx context.Context, knowledge *biz.Knowledge) (*bi
 
 func (r *knowledgeRepo) Update(ctx context.Context, knowledge *biz.Knowledge) (*biz.Knowledge, error) {
 	r.log.Infof("Update knowledge base: %d", knowledge.ID)
-	// 只更新需要的字段，避免修改 CreatedAt 字段
+	// 只更新名称、描述等字段，不修改 parent_knowledge_id（通过 move 接口修改）
 	result := r.data.MySQL.WithContext(ctx).Model(knowledge).Updates(map[string]interface{}{
-		"domain_id":           knowledge.DomainID,
-		"parent_knowledge_id": knowledge.ParentKnowledgeID,
-		"name":                knowledge.Name,
-		"description":         knowledge.Description,
-		"by_sort":             knowledge.BySort,
-		"updated_at":          knowledge.UpdatedAt,
+		"domain_id":   knowledge.DomainID,
+		"name":        knowledge.Name,
+		"description": knowledge.Description,
+		"by_sort":     knowledge.BySort,
+		"updated_at":  knowledge.UpdatedAt,
 	})
 	if result.Error != nil {
 		r.log.Errorf("Failed to update knowledge: %v1", result.Error)
@@ -75,4 +75,17 @@ func (r *knowledgeRepo) Get(ctx context.Context, id int64) (*biz.Knowledge, erro
 		return nil, result.Error
 	}
 	return &knowledge, nil
+}
+
+func (r *knowledgeRepo) UpdateParentAndSort(ctx context.Context, id int64, parentID int64, bySort int64) error {
+	result := r.data.MySQL.WithContext(ctx).Model(&biz.Knowledge{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"parent_knowledge_id": parentID,
+		"by_sort":             bySort,
+		"updated_at":          time.Now(),
+	})
+	if result.Error != nil {
+		r.log.Errorf("Failed to update parent and sort: %v", result.Error)
+		return result.Error
+	}
+	return nil
 }

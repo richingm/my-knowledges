@@ -57,19 +57,23 @@ export const knowledgeService = {
     }
   },
 
-  async updateKnowledge(knowledgeId, domainId, name, description) {
+  async updateKnowledge(knowledgeId, domainId, name, description, parentKnowledgeId) {
     try {
+      const body = {
+        domain_id: domainId,
+        name: name,
+        description: description
+      };
+      if (parentKnowledgeId !== undefined) {
+        body.parent_knowledge_id = parentKnowledgeId;
+      }
       const response = await fetch(`/api/v1/knowledges/${knowledgeId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify({
-          domain_id: domainId,
-          name: name,
-          description: description
-        })
+        body: JSON.stringify(body)
       });
       if (!response.ok) {
         throw new Error('Failed to update knowledge');
@@ -92,8 +96,8 @@ export const knowledgeService = {
         },
         body: JSON.stringify({
           id: parseInt(knowledgeId),
-          newParentKnowledgeId: newParentId ? parseInt(newParentId) : 0,
-          domain_id: parseInt(domainId)
+          newParentId: newParentId ? parseInt(newParentId) : 0,
+          domainId: parseInt(domainId)
         })
       });
       if (!response.ok) {
@@ -103,6 +107,32 @@ export const knowledgeService = {
       return data;
     } catch (error) {
       console.error('Error moving knowledge:', error);
+      return null;
+    }
+  },
+
+  async sortKnowledge(items) {
+    try {
+      const response = await fetch('/api/v1/knowledges/sort', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            id: parseInt(item.id),
+            bySort: parseInt(item.by_sort)
+          }))
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to sort knowledge');
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error sorting knowledge:', error);
       return null;
     }
   }

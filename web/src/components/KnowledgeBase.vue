@@ -459,6 +459,27 @@ const handleUpdateKnowledge = async (knowledgeId, name, description) => {
   }
 };
 
+const handleRenameKnowledge = async (knowledgeId, newName) => {
+  try {
+    const node = findKnowledgeById(knowledgeTree.value, knowledgeId.toString());
+    const description = node?.description || '';
+    const result = await knowledgeService.updateKnowledge(
+      knowledgeId,
+      selectedDomain.value?.id,
+      newName,
+      description
+    );
+
+    if (result) {
+      await fetchKnowledgeTree(selectedDomain.value?.id);
+      showNotification('知识库重命名成功!', 'success');
+    }
+  } catch (error) {
+    console.error('重命名知识库失败:', error);
+    showNotification('重命名知识库失败!', 'error');
+  }
+};
+
 const handleDeleteKnowledge = async (knowledgeId) => {
   if (!confirm('确定删除此知识库吗？这将删除所有子知识库和文章！')) {
     return;
@@ -690,6 +711,95 @@ const findKnowledgeById = (nodes, id) => {
   return null;
 };
 
+// 查找节点的父节点和同级兄弟列表
+const findParentAndSiblings = (nodes, targetId, parent = null) => {
+  for (const node of nodes) {
+    if (node.id && node.id.toString() === targetId.toString()) {
+      return { parent, siblings: nodes };
+    }
+    if (node.children && node.children.length > 0) {
+      const result = findParentAndSiblings(node.children, targetId, node);
+      if (result) return result;
+    }
+  }
+  return null;
+};
+
+// 检查 targetId 是否是 sourceId 的后代
+const isDescendant = (nodes, sourceId, targetId) => {
+  const source = findKnowledgeById(nodes, sourceId.toString());
+  if (!source || !source.children) return false;
+  for (const child of source.children) {
+    if (child.id.toString() === targetId.toString()) return true;
+    if (isDescendant([child], sourceId, targetId)) return true;
+  }
+  return false;
+};
+
+// 拖拽处理
+const handleDragDrop = async (payload) => {
+  const { draggedId, targetId, position } = payload;
+
+  // 不能拖到自身
+  if (draggedId === targetId) return;
+  // 不能拖到自己的后代节点
+  if (isDescendant(knowledgeTree.value, draggedId, targetId)) {
+    showNotification('不能拖拽到自身子节点下!', 'error');
+    return;
+  }
+
+  const draggedNode = findKnowledgeById(knowledgeTree.value, draggedId.toString());
+  const targetNode = findKnowledgeById(knowledgeTree.value, targetId.toString());
+  if (!draggedNode || !targetNode) return;
+
+  let newParentId;
+  let newSiblings;
+
+  if (position === 'inside') {
+    // 拖入目标节点作为子级
+    newParentId = targetId;
+    newSiblings = (targetNode.children || []).concat([draggedNode]);
+  } else {
+    // before/after: 与目标节点同级
+    const info = findParentAndSiblings(knowledgeTree.value, targetId);
+    if (!info) return;
+    newParentId = info.parent ? info.parent.id : 0;
+    const siblings = info.siblings.filter(n => n.id !== draggedId);
+    const targetIndex = siblings.findIndex(n => n.id === targetId);
+    if (position === 'before') {
+      siblings.splice(targetIndex, 0, draggedNode);
+    } else {
+      siblings.splice(targetIndex + 1, 0, draggedNode);
+    }
+    newSiblings = siblings;
+  }
+
+  // 构建 sort items
+  const sortItems = newSiblings.map((node, index) => ({
+    id: node.id,
+    by_sort: (index + 1) * 10
+  }));
+
+  try {
+    // 如果父级变了，先移动
+    const draggedInfo = findParentAndSiblings(knowledgeTree.value, draggedId);
+    const oldParentId = draggedInfo?.parent ? draggedInfo.parent.id : 0;
+
+    if (newParentId !== oldParentId) {
+      await knowledgeService.moveKnowledge(draggedId, newParentId, selectedDomain.value?.id);
+    }
+
+    // 重新排序同级节点
+    await knowledgeService.sortKnowledge(sortItems);
+
+    await fetchKnowledgeTree(selectedDomain.value?.id);
+    showNotification('排序成功!', 'success');
+  } catch (error) {
+    console.error('拖拽排序失败:', error);
+    showNotification('拖拽排序失败!', 'error');
+  }
+};
+
 const handleLogout = async () => {
   await authService.logout();
   router.push('/login');
@@ -763,14 +873,15 @@ onUnmounted(() => {
               <button @click="handleCreateKnowledge()" class="create-btn">+ 新建</button>
             </div>
           </div>
-          <KnowledgeTree 
-            :tree-data="knowledgeTree" 
+          <KnowledgeTree
+            :tree-data="knowledgeTree"
             :selected-id="selectedKnowledge?.id"
             @node-click="handleKnowledgeClick"
             @create-child="handleCreateKnowledge"
             @move-node="handleMoveKnowledge"
             @delete-node="handleDeleteKnowledge"
-            @update-node="handleUpdateKnowledge"
+            @rename-node="handleRenameKnowledge"
+            @drag-drop="handleDragDrop"
           />
         </div>
         

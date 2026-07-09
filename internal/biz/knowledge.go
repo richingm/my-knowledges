@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ type Knowledge struct {
 type KnowledgeRepo interface {
 	Save(context.Context, *Knowledge) (*Knowledge, error)
 	Update(context.Context, *Knowledge) (*Knowledge, error)
+	UpdateParentAndSort(context.Context, int64, int64, int64) error
 	Delete(context.Context, int64) error
 	Get(context.Context, int64) (*Knowledge, error)
 	ListByDomainID(context.Context, int64) ([]*Knowledge, error)
@@ -90,10 +92,21 @@ func (uc *KnowledgeUsecase) MoveKnowledge(ctx context.Context, id int64, newPare
 	if err != nil {
 		return err
 	}
-	// 更新父知识库 ID 和领域 ID
+	// 不能移动到自身或自身的子节点下
+	if id == newParentId {
+		return fmt.Errorf("不能移动到自身")
+	}
+	// 更新父知识库 ID 和排序
 	knowledge.ParentKnowledgeID = newParentId
 	knowledge.DomainID = domainId
 	knowledge.UpdatedAt = time.Now()
-	_, err = uc.repo.Update(ctx, knowledge)
-	return err
+	return uc.repo.UpdateParentAndSort(ctx, id, newParentId, knowledge.BySort)
+}
+
+// MoveKnowledgeWithSort 移动知识库并设置排序
+func (uc *KnowledgeUsecase) MoveKnowledgeWithSort(ctx context.Context, id int64, newParentId int64, bySort int64) error {
+	if id == newParentId {
+		return fmt.Errorf("不能移动到自身")
+	}
+	return uc.repo.UpdateParentAndSort(ctx, id, newParentId, bySort)
 }
