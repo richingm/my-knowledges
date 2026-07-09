@@ -539,6 +539,8 @@ const handleUpdateArticle = async () => {
   
   try {
     const content = editableArticle.value.content;
+    const importance = editableArticle.value.importance || 'level-3';
+    const level = parseInt(importance.replace('level-', ''));
     
     const result = await articleService.updateArticle(
       editableArticle.value.id,
@@ -546,7 +548,7 @@ const handleUpdateArticle = async () => {
         knowledge_id: selectedKnowledge.value?.id,
         title: editableArticle.value.title,
         content: content,
-        importance: editableArticle.value.importance
+        level: level
       }
     );
     
@@ -595,22 +597,22 @@ const cancelEdit = () => {
 
 const getImportanceColor = (importance) => {
   const colorMap = {
-    'level-1': '#28a745',
-    'level-2': '#fd7e14',
-    'level-3': '#ffc107',
+    'level-5': '#dc3545',
     'level-4': '#6f42c1',
-    'level-5': '#dc3545'
+    'level-3': '#28a745',
+    'level-2': '#000',
+    'level-1': '#666666'
   };
   return colorMap[importance] || '#6c757d';
 };
 
 const getImportanceText = (importance) => {
   const textMap = {
-    'level-1': '非常重要',
-    'level-2': '比较重要',
+    'level-5': '非常重要',
+    'level-4': '比较重要',
     'level-3': '一般',
-    'level-4': '不太重要',
-    'level-5': '不重要'
+    'level-2': '不太重要',
+    'level-1': '不重要'
   };
   return textMap[importance] || '未设置';
 };
@@ -818,11 +820,11 @@ onUnmounted(() => {
                     {{ getImportanceText(articleDetail.importance) }}
                   </div>
                   <select v-else v-model="editableArticle.importance" class="importance-select">
-                    <option value="level-1">非常重要</option>
-                    <option value="level-2">比较重要</option>
+                    <option value="level-5">非常重要</option>
+                    <option value="level-4">比较重要</option>
                     <option value="level-3">一般</option>
-                    <option value="level-4">不太重要</option>
-                    <option value="level-5">不重要</option>
+                    <option value="level-2">不太重要</option>
+                    <option value="level-1">不重要</option>
                   </select>
                 </div>
                 <div class="article-actions">
@@ -1388,7 +1390,7 @@ onUnmounted(() => {
   border: none;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.8);
-  color: #333;
+  color: #666666;
   font-size: 1.25rem;
   cursor: pointer;
 }

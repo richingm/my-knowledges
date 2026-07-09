@@ -196,15 +196,15 @@ const handleNodeClick = (node) => {
 }
 
 .node-name.level-3 {
-  color: #333;
+  color: #28a745;
 }
 
 .node-name.level-2 {
-  color: #fd7e14;
+  color: #000;
 }
 
 .node-name.level-1 {
-  color: #28a745;
+  color: #666666;
 }
 
 .tree-children {
