@@ -1,5 +1,18 @@
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue';
+import { ref, watch, onMounted, nextTick, provide, inject } from 'vue';
+
+// 通过 provide/inject 让递归子组件实例共享同一份拖拽状态
+const dragStateKey = 'knowledgeDragState';
+let dragState = inject(dragStateKey, null);
+if (!dragState) {
+  dragState = {
+    draggedNodeId: ref(null),
+    dragOverId: ref(null),
+    dragOverPosition: ref(null)
+  };
+  provide(dragStateKey, dragState);
+}
+const { draggedNodeId, dragOverId, dragOverPosition } = dragState;
 
 const props = defineProps({
   treeData: {
@@ -17,11 +30,6 @@ const emit = defineEmits(['node-click', 'create-child', 'delete-node', 'move-nod
 const expandedNodes = ref(new Set());
 const editingId = ref(null);
 const editingName = ref('');
-
-// 拖拽状态
-const draggedNodeId = ref(null);
-const dragOverId = ref(null);
-const dragOverPosition = ref(null); // 'before' | 'after' | 'inside'
 
 // 递归展开所有节点
 const expandAllNodes = (nodes) => {

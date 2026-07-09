@@ -555,6 +555,88 @@ const findArticleById = (nodes, id) => {
   return null;
 };
 
+// 查找文章的父节点和同级兄弟列表
+const findArticleParentAndSiblings = (nodes, targetId, parent = null) => {
+  for (const node of nodes) {
+    if (node.id && node.id.toString() === targetId.toString()) {
+      return { parent, siblings: nodes };
+    }
+    if (node.children && node.children.length > 0) {
+      const result = findArticleParentAndSiblings(node.children, targetId, node);
+      if (result) return result;
+    }
+  }
+  return null;
+};
+
+// 检查 targetId 是否是 sourceId 的后代
+const isArticleDescendant = (nodes, sourceId, targetId) => {
+  const source = findArticleById(nodes, sourceId.toString());
+  if (!source || !source.children) return false;
+  for (const child of source.children) {
+    if (child.id.toString() === targetId.toString()) return true;
+    if (isArticleDescendant([child], sourceId, targetId)) return true;
+  }
+  return false;
+};
+
+// 文章拖拽处理
+const handleArticleDragDrop = async (payload) => {
+  const { draggedId, targetId, position } = payload;
+
+  if (draggedId === targetId) return;
+  if (isArticleDescendant(articleTree.value, draggedId, targetId)) {
+    showNotification('不能拖拽到自身子节点下!', 'error');
+    return;
+  }
+
+  const draggedNode = findArticleById(articleTree.value, draggedId.toString());
+  const targetNode = findArticleById(articleTree.value, targetId.toString());
+  if (!draggedNode || !targetNode) return;
+
+  let newParentId;
+  let newSiblings;
+
+  if (position === 'inside') {
+    newParentId = targetId;
+    newSiblings = (targetNode.children || []).concat([draggedNode]);
+  } else {
+    const info = findArticleParentAndSiblings(articleTree.value, targetId);
+    if (!info) return;
+    newParentId = info.parent ? info.parent.id : 0;
+    const siblings = info.siblings.filter(n => n.id !== draggedId);
+    const targetIndex = siblings.findIndex(n => n.id === targetId);
+    if (position === 'before') {
+      siblings.splice(targetIndex, 0, draggedNode);
+    } else {
+      siblings.splice(targetIndex + 1, 0, draggedNode);
+    }
+    newSiblings = siblings;
+  }
+
+  const sortItems = newSiblings.map((node, index) => ({
+    id: node.id,
+    by_sort: (index + 1) * 10
+  }));
+
+  try {
+    const draggedInfo = findArticleParentAndSiblings(articleTree.value, draggedId);
+    const oldParentId = draggedInfo?.parent ? draggedInfo.parent.id : 0;
+
+    if (newParentId !== oldParentId) {
+      await articleService.moveArticle(draggedId, newParentId, selectedKnowledge.value?.id);
+    }
+
+    await articleService.sortArticle(sortItems);
+
+    await fetchArticleTree(selectedKnowledge.value?.id);
+    showNotification('排序成功!', 'success');
+  } catch (error) {
+    console.error('文章拖拽排序失败:', error);
+    showNotification('文章拖拽排序失败!', 'error');
+  }
+};
+
 const handleUpdateArticle = async () => {
   if (!editableArticle.value) return;
   
@@ -903,13 +985,14 @@ onUnmounted(() => {
               <button @click="handleCreateArticle()" class="create-btn" :disabled="!selectedKnowledge">+ 新建</button>
             </div>
           </div>
-          <ArticleTree 
-            :tree-data="articleTree" 
+          <ArticleTree
+            :tree-data="articleTree"
             :selected-id="selectedArticle?.id"
             @node-click="handleArticleClick"
             @create-child="handleCreateArticle"
             @move-node="handleMoveArticle"
             @delete-node="handleDeleteArticle"
+            @drag-drop="handleArticleDragDrop"
           />
         </div>
         

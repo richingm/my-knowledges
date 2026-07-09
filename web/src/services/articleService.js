@@ -117,5 +117,31 @@ export const articleService = {
       console.error('Error moving article:', error);
       return null;
     }
+  },
+
+  async sortArticle(items) {
+    try {
+      const response = await fetch('/api/v1/articles/sort', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            id: parseInt(item.id),
+            bySort: parseInt(item.by_sort)
+          }))
+        })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to sort article');
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error sorting article:', error);
+      return null;
+    }
   }
 };
