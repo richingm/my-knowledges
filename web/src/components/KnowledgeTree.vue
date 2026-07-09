@@ -214,7 +214,6 @@ const resetDrag = () => {
           />
           <div class="node-actions">
             <button class="action-btn create-btn" @click.stop="emit('create-child', node.id)" title="创建子知识库">+</button>
-            <button class="action-btn move-btn" @click.stop="emit('move-node', node.id)" title="移动知识库">↕</button>
             <button class="action-btn delete-btn" @click.stop="emit('delete-node', node.id)" title="删除知识库">×</button>
           </div>
         </div>
