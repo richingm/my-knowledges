@@ -79,7 +79,7 @@ func NewHTTPServer(c *conf.Server, data *conf.Data, greeter *service.GreeterServ
 				}
 				if (r.URL.Path == "/upload/file/http" || r.URL.Path == "/upload/image/http" || r.URL.Path == "/api/v1/files/upload") && r.Method == http.MethodPost {
 					if strings.Contains(r.Header.Get("Content-Type"), "multipart/form-data") {
-						if err := r.ParseMultipartForm(10 << 20); err != nil {
+						if err := r.ParseMultipartForm(100 << 20); err != nil {
 							http.Error(w, "Failed to parse multipart form", http.StatusBadRequest)
 							return
 						}
